@@ -30,16 +30,15 @@ class GetCookie:
         输入url获取正确cookies
         '''
         response = self.session.get(url=url)
-        cookie = response.headers['Set-Cookie'].split(';')[0].split('=')
-        cookies = {cookie[0]: cookie[1]}
+        cookies = response.cookies.get_dict()
         cookie = re.findall(r'(cookie=.*?)location', response.text)[0]
         js_code = "function get_cookies(){" + cookie + "return cookie}"
-        cookie = execjs.compile(js_code).call('get_cookies').split(';')[0].split('=')
-        cookies.update({cookie[0]: cookie[1]})
-        response = self.session.get(url=url, cookies=cookies)
-        data = ast.literal_eval(re.findall(r'go\((.*?)\)', response.text)[1])
-        cookie = self.go(data)
-        cookies.update({'__jsl_clearance': cookie, '__jsl_clearance_s': cookie})
+        js_cookie = execjs.compile(js_code).call('get_cookies').split(';')[0].split('=')
+        cookies.update({js_cookie[0]: js_cookie[1]})
+        respond = self.session.get(url=url, cookies=cookies)
+        data = ast.literal_eval(re.findall(r'go\((.*?)\)', respond.text)[1])
+        data_cookie = self.go(data)
+        cookies.update({js_cookie[0]: data_cookie})
         return cookies
 
 if __name__ == '__main__':
