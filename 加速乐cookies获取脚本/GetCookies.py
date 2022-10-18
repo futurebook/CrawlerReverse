@@ -19,18 +19,11 @@ class GetCookie:
         for i in chars:
             for j in chars:
                 cookie = data["bts"][0] + i + j + data["bts"][1]
-                if data['ha'] == 'md5':
-                    encrypt = md5()
-                elif data['ha'] == 'sha1':
-                    encrypt = sha1()
-                elif data['ha'] == 'sha256':
-                    encrypt = sha256()
-                try:
+                if data['ha']:
+                    encrypt = eval(data['ha']+'()')
                     encrypt.update(cookie.encode(encoding='utf-8'))
                     if encrypt.hexdigest() == data['ct']:
                         return cookie
-                except Exception as r:
-                    print(r)
 
     def get_cookies(self, url):
         '''
